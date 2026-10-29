@@ -2,6 +2,7 @@
 /.mygo/
 mygo_windows_*.syso
 /mayoi
+/mayoi-*.AppImage
 /cmd/mayoi/mayoi
 *.test
 /.agents/
