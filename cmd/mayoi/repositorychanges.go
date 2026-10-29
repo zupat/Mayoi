@@ -84,20 +84,24 @@ func (a *app) scmView(c *ui.Context) {
 		// Keep both panes reachable when a saved layout opens in a smaller window.
 		minimum := min(float32(100), height/3)
 		changes := ui.Column(c.Key("repository-changes-pane")).Shrink(0).MinHeight(0)
+		history := ui.Column(c.Key("history:"+ctx.git.repo.Root)).MinHeight(0).
+			BorderWidth(1, 0, 0, 0).BorderColor(a.pal.border)
 		if ratio > 0 {
 			changes.Height(clamp(height*ratio, minimum, height-minimum))
+			history.Height(0).Grow(1)
 		} else {
-			// Until dragged, fit the list's content, leaving at least half
-			// the sidebar to history when most repositories are clean.
-			changes.MaxHeight(height / 2)
+			// Until dragged, the changes take the sidebar and the commits
+			// and repository stay pinned to its bottom, as tall as their
+			// rows, up to half of it.
+			changes.Grow(1)
+			history.Shrink(1).MaxHeight(height / 2)
 		}
 		changes.Children(func() {
 			ui.Text(c, strings.ToUpper(locales.GroupChanges())).FontSize(11).FontWeight(600).
 				LetterSpacing(0.4).TextColor(a.pal.muted).Height(24).Padding(4, 10).Shrink(0)
 			a.repositoryChanges(c, contexts)
 		})
-		ui.Column(c.Key("history:"+ctx.git.repo.Root)).Height(0).Grow(1).MinHeight(0).
-			BorderWidth(1, 0, 0, 0).BorderColor(a.pal.border).Children(func() {
+		history.Children(func() {
 			ctx.scmList(c)
 			// This sits on the history's top edge and does not move with either list.
 			a.splitter(c, edgeTop, func(delta float32) {

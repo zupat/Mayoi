@@ -6,6 +6,7 @@ needs a `## <version>` section here, or its build fails.
 ## Unreleased
 
 - Source Control lists the Git repositories inside the open repository too, each with its own changes and commit.
+- **Commits** and **Repository** stay pinned to the bottom of Source Control, so the changes get the space above them.
 - Mermaid diagrams in a Markdown preview open over the window from their hover button or a double-click.
 - An opened diagram zooms with its `−`/`+` buttons or `Cmd`-scroll, and drags to move; `Esc` closes it.
 

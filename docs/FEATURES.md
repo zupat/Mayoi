@@ -194,9 +194,9 @@ updated reference in the parent separately. Uninitialized submodules remain
 entries in the parent until initialized externally.
 
 Changes and history scroll independently. Until the divider is dragged, changes
-fit their content up to half the view, leaving more room for history when most
-repositories are clean. Dragging the divider saves its position with the
-workspace's layout.
+fill the space and the commits and repository sections stay pinned to the
+bottom, as tall as their rows, up to half the view. Dragging the divider saves
+its position with the workspace's layout.
 
 With multiple repositories, the lower part of Source Control shows the selected
 repository's commit graph. The repository button in its header and in the status
