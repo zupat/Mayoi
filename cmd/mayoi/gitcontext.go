@@ -159,19 +159,21 @@ func (a *app) discoverRepositories() {
 				}
 			})
 		}
-		// repos[0] is the folder's own work tree, nil when it is none: then
-		// the work trees in the folders under it come after.
+		// repos[0] is the folder's own work tree, nil when it is none. The
+		// work trees in the folders under it come after, those inside it
+		// too, though Git counts each of them as one untracked folder.
 		repos := []*git.Repo{root}
 		seen := map[string]bool{}
 		if root != nil {
 			seen[root.Root] = true
-		} else {
-			nested, err := git.Nested(folder, git.NestedDepth)
-			if err != nil {
-				failed()
-				return
-			}
-			for _, r := range nested {
+		}
+		nested, err := git.Nested(folder, git.NestedDepth)
+		if err != nil {
+			failed()
+			return
+		}
+		for _, r := range nested {
+			if !seen[r.Root] {
 				seen[r.Root] = true
 				repos = append(repos, r)
 			}

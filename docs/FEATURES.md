@@ -170,16 +170,19 @@ tree, with a count of them. Files are grouped as merge changes, staged changes, 
 - A clean work tree says so, and offers to push or pull when the branch is ahead of its upstream or behind it.
 - A folder outside a repository gets an **Initialize Repository** button.
 
-### Submodules and repository selection
+### Repositories, submodules and selection
 
-Initialized submodules, including nested submodules, appear as separate,
-collapsible sections in one continuously scrolling Source Control list. The
-current repository's header stays at the top while its changes scroll beneath
-it. The current change group (such as Staged Changes or Changes) stays directly
-beneath that header, with its counts and actions, until the next group or
-repository pushes it away. Headers combine the repository name, branch or
-detached HEAD, and repository actions; a narrow sidebar keeps remote actions in
-each repository's **⋯** menu.
+Initialized submodules, including nested submodules, and the Git repositories
+inside the window's folder, even when it is a work tree itself, appear as
+separate, collapsible sections in one continuously scrolling Source Control
+list. Git counts a repository inside a work tree as one untracked folder of it;
+the view lists it as a repository of its own, with its changes, history and
+commit. The current repository's header stays at the top while its changes
+scroll beneath it. The current change group (such as Staged Changes or Changes)
+stays directly beneath that header, with its counts and actions, until the next
+group or repository pushes it away. Headers combine the repository name, branch
+or detached HEAD, and repository actions; a narrow sidebar keeps remote actions
+in each repository's **⋯** menu.
 Repositories with changes start expanded; clean repositories start collapsed and
 can be expanded to show their retained commit draft and a disabled commit button.
 The arrow expands or collapses a section; clicking its name selects its history.
@@ -191,9 +194,9 @@ updated reference in the parent separately. Uninitialized submodules remain
 entries in the parent until initialized externally.
 
 Changes and history scroll independently. Until the divider is dragged, changes
-fit their content up to half the view, leaving more room for history when most
-repositories are clean. Dragging the divider saves its position with the
-workspace's layout.
+fill the space and the commits and repository sections stay pinned to the
+bottom, as tall as their rows, up to half the view. Dragging the divider saves
+its position with the workspace's layout.
 
 With multiple repositories, the lower part of Source Control shows the selected
 repository's commit graph. The repository button in its header and in the status
@@ -205,9 +208,8 @@ The status bar picker replaces its folder item, so the root is not listed twice.
 Destructive confirmation dialogs name their target repository, including in Auto
 mode. Saved diff repository paths are relative to the workspace.
 Discovery skips repositories without `.gitmodules` and refreshes on Git metadata
-or `.gitmodules` changes, rather than enumerating indexes on a timer.
-Opening a worktree containing submodules uses the same behavior; other worktrees
-are opened separately as before.
+or `.gitmodules` changes, rather than enumerating indexes on a timer. Work trees
+more than two folders below the window are opened separately as before.
 
 ### Commits
 

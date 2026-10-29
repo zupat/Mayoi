@@ -626,7 +626,7 @@ func (a *app) saveAll() {
 // changes of its own shows the file's new text.
 func (a *app) diskChanged(changed, removed []string) {
 	for _, path := range append(slices.Clone(changed), removed...) {
-		if filepath.Base(path) == ".gitmodules" || a.git.repo == nil && a.mayHoldWorkTree(path) {
+		if filepath.Base(path) == ".gitmodules" || a.mayHoldWorkTree(path) {
 			a.repositories.dirty = true
 		}
 	}
@@ -668,9 +668,10 @@ func (a *app) diskChanged(changed, removed []string) {
 	a.gitChanged()
 }
 
-// mayHoldWorkTree reports whether a path made or gone under a folder that
-// is not a work tree may add or drop one under it: a .git, or a folder
-// where one may be, cloned or removed, outside the work trees found.
+// mayHoldWorkTree reports whether a path made or gone under a folder of the
+// window's own work tree, or of no work tree, may add or drop one: a .git,
+// or a folder where one may be, cloned or removed, outside the work trees
+// found.
 func (a *app) mayHoldWorkTree(path string) bool {
 	if filepath.Base(path) == ".git" {
 		return true
@@ -680,7 +681,22 @@ func (a *app) mayHoldWorkTree(path string) bool {
 		return false
 	}
 	ctx := a.repositoryForPath(path)
-	return ctx.git.repo == nil || ctx.git.repo.Root == path
+	switch {
+	case ctx.git.repo == nil:
+		// The folder is not a work tree: those in the folders under it are
+		// what the view lists.
+		return true
+	case ctx.git.repo.Root == path:
+		// A work tree of the list, made or removed.
+		return true
+	case ctx.git.repo != a.git.repo:
+		// A folder of a work tree found already moves nothing.
+		return false
+	}
+	// A folder of the window's own work tree may come to hold one, cloned
+	// there; a file written in it, as a save is, cannot.
+	fi, err := os.Stat(path)
+	return err == nil && fi.IsDir()
 }
 
 // reloadDoc makes a document's text the file's on disk, as a step of

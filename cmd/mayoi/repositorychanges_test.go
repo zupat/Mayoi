@@ -165,8 +165,8 @@ func TestRepositoryChangesResizeAndRemember(t *testing.T) {
 		t.Fatal("missing history")
 	}
 	height := float32(1000)
-	if history.Y < height*0.4 || history.Y > height*0.65 {
-		t.Fatalf("initial split is not halfway: %v in %v", history, height)
+	if history.Y < height*0.75 {
+		t.Fatalf("changes did not take the space above the pinned history: %v in %v", history, height)
 	}
 	handle, ok := tt.Find(locales.ScmResizeChanges())
 	if !ok {
@@ -174,12 +174,12 @@ func TestRepositoryChangesResizeAndRemember(t *testing.T) {
 	}
 	x, y := handle.X+handle.W/2, handle.Y+handle.H/2
 	tt.Press(x, y)
-	tt.Move(x, y+60)
-	tt.Release(x, y+60)
+	tt.Move(x, y-200)
+	tt.Release(x, y-200)
 	hs.settle()
 	resized, ok := tt.Find("COMMITS")
-	if !ok || resized.Y < history.Y+50 || a.window.ScmChangesRatio <= 0.5 {
-		t.Fatalf("splitter did not resize changes: %v -> %v, ratio %v", history, resized, a.window.ScmChangesRatio)
+	if !ok || resized.Y > history.Y-150 || a.window.ScmChangesRatio <= 0 || a.window.ScmChangesRatio >= 0.75 {
+		t.Fatalf("splitter did not give history room: %v -> %v, ratio %v", history, resized, a.window.ScmChangesRatio)
 	}
 	if a.session().ScmChangesRatio != a.window.ScmChangesRatio {
 		t.Fatal("split position not included in the saved session")
@@ -224,23 +224,26 @@ func TestRepositoryHeaderUsesActualWidth(t *testing.T) {
 	}
 }
 
-func TestRepositoryChangesFitContent(t *testing.T) {
+// The commits and repository sections stay pinned to the bottom of the
+// sidebar, so the changes get all the space above them by default.
+func TestRepositoryChangesPinnedBottom(t *testing.T) {
 	hs, sub, _ := submoduleHarness(t)
 	a, tt := hs.a, hs.tt
 	tt.SetSize(1200, 1000)
 	hs.settle()
 	history, ok := tt.Find("COMMITS")
-	if !ok || history.Y > 200 {
-		t.Fatalf("clean repositories left empty space above history: %v (%v)", history, ok)
+	if !ok || history.Y < 800 {
+		t.Fatalf("clean repositories did not pin history to the bottom: %v (%v)", history, ok)
 	}
+	pinned := history.Y
 	if err := tt.Click(locales.ScmToggleRepository(sub.label())); err != nil {
 		t.Fatal(err)
 	}
 	hs.settle()
 	input, ok := tt.Find(locales.ScmCommitMessage())
 	expanded, _ := tt.Find("COMMITS")
-	if !ok || expanded.Y <= input.Y+input.H || expanded.Y >= 450 {
-		t.Fatalf("expanded draft did not size the changes pane: input=%v, history=%v", input, expanded)
+	if !ok || expanded.Y <= input.Y+input.H || expanded.Y != pinned {
+		t.Fatalf("an expanded draft moved the pinned history: input=%v, history=%v", input, expanded)
 	}
 	for i := range 40 {
 		if err := os.WriteFile(filepath.Join(sub.git.repo.Root, fmt.Sprintf("new-%02d.txt", i)), []byte("new\n"), 0o644); err != nil {
@@ -250,16 +253,16 @@ func TestRepositoryChangesFitContent(t *testing.T) {
 	a.gitChanged()
 	settleRepositories(t, hs, 2)
 	full, _ := tt.Find("COMMITS")
-	if full.Y < 450 || full.Y > 600 || a.window.ScmChangesRatio != 0 {
-		t.Fatalf("automatic pane did not stop at half without saving a ratio: %v, ratio %v", full, a.window.ScmChangesRatio)
+	if full.Y != pinned || a.window.ScmChangesRatio != 0 {
+		t.Fatalf("changes pushed the pinned history or saved a ratio: %v, ratio %v", full, a.window.ScmChangesRatio)
 	}
 	if err := tt.Click(locales.ScmToggleRepository(sub.label())); err != nil {
 		t.Fatal(err)
 	}
 	hs.settle()
 	collapsed, _ := tt.Find("COMMITS")
-	if collapsed.Y >= full.Y-50 || a.window.ScmChangesRatio != 0 {
-		t.Fatalf("automatic pane did not shrink after collapse: %v -> %v", full, collapsed)
+	if collapsed.Y != pinned || a.window.ScmChangesRatio != 0 {
+		t.Fatalf("a collapse moved the pinned history: %v -> %v, ratio %v", full, collapsed, a.window.ScmChangesRatio)
 	}
 }
 

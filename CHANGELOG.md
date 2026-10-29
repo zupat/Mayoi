@@ -5,6 +5,8 @@ needs a `## <version>` section here, or its build fails.
 
 ## Unreleased
 
+- Source Control lists the Git repositories inside the open repository too, each with its own changes and commit.
+- **Commits** and **Repository** stay pinned to the bottom of Source Control, so the changes get the space above them.
 - Mermaid diagrams in a Markdown preview open over the window from their hover button or a double-click.
 - An opened diagram zooms with its `−`/`+` buttons or `Cmd`-scroll, and drags to move; `Esc` closes it.
 
@@ -32,6 +34,8 @@ needs a `## <version>` section here, or its build fails.
 - The **⋯** menu's **Stashes** submenu applies, pops or drops one of the last ten stashes; dropping asks first.
 - **Git → Stashes…** lists every stash to search, with ⏎ to apply, ⌘⏎ to pop and ⌘⌫ to drop.
 - Tall Mermaid diagrams in a preview show their boxes and arrows, not just their labels.
+
+- Source Control lists the Git repositories inside the open repository too, each with its own changes and commit.
 
 ## 0.14.1
 
